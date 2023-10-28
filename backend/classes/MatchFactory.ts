@@ -13,6 +13,9 @@ export default class MatchFactory {
 
         return { admin, id };
     }
+    public static existingMatch (id: number) {
+        return this._matches.length > id;
+    }
     public static joinMatch (name: string, id: number) {
         for(let match of this._matches) {
             const index = match.getID();
