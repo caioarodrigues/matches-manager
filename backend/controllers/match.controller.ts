@@ -32,10 +32,31 @@ export async function joinMatch (req: Request, res: Response) {
 }
 
 async function quitMatch (req: Request, res: Response) {
-    const { cookies: decodedToken } = req;
-    const user = JSON.parse(decodedToken);
+    const { cookies: player } = req;
+    const { name, id: playerID } = player;
+    const { matchID } = req.body;
 
-    
+    try {
+        MatchFactory.quitMatch(playerID, matchID);
+
+        return res.status(200).json({ player, matchID });
+    }
+    catch (err){
+        return res.status(500);
+    }
 }
 
-export default { newMatch, listMatches, joinMatch }
+async function dropMatch (req: Request, res: Response) {
+    const { id } = req.body;
+
+    try {
+        const match = MatchFactory.dropMatch(id);
+    
+        return match;
+    }
+    catch (err) {
+        return res.status(500);
+    }
+}
+
+export default { newMatch, listMatches, joinMatch, quitMatch, dropMatch }

@@ -29,26 +29,27 @@ export default class MatchFactory {
             }
         }
     }
-    public static finishMatch (admin: PlayerType, idMatch: number) {
-        const index = this._matches.findIndex(m => {
-            const id= m.getID();
+    public static quitMatch (playerID: number, idMatch: number) {
+        for (let match of this._matches) {
+            const id = match.getID();
 
             if (id === idMatch) {
-                return id;
+                match.removePlayer(playerID);
+
+                return;
+            }
+        }
+    }
+    public static isAdmin (admin:  PlayerType, idMatch: number) {
+        const index = this._matches.findIndex(m => {
+            const id = m.getID();
+
+            if (id === idMatch) {
+                return m.getAdmin();
             }
         });
 
-        if (index === -1) {
-            throw new Error ("Admin not found!");
-        }
-
-        const matchAdmin = this._matches[index].getAdmin();
-
-        if(admin === matchAdmin) {
-            this._matches.splice(index, 1);
-
-            return { admin, idMatch };
-        }
+        return index !== 1; 
     }
 
     public static getAllMatches () {
@@ -59,5 +60,10 @@ export default class MatchFactory {
         });
         
         return matches;
+    }
+    public static dropMatch(matchID: number) {
+        const match = this._matches.splice(matchID, 1);
+
+        return match;
     }
 }

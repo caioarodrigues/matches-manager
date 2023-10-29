@@ -16,12 +16,17 @@ async function generateToken (req: Request, res: Response, next: NextFunction) {
 }
 
 async function decodeToken (req: Request, res: Response, next: NextFunction) {
-    const { signedCookies: token} = req;
-    const user = jwt.verify(token, SALT);
-
-    console.log(user);
-    req.cookies = user;
-    next();
+    console.log('aqui')
+    try {
+        const token = req.header("Authorization")!;
+        const user = jwt.verify(token, SALT);
+    
+        req.cookies = user;
+        next();
+    }
+    catch (err) {
+        return res.status(500);
+    }
 }
 
 async function existingMatch (req: Request, res: Response, next: NextFunction) {
@@ -32,8 +37,21 @@ async function existingMatch (req: Request, res: Response, next: NextFunction) {
     }
 
     return res.status(500).json({
-        msg: "esta partida não existe!"
+        msg: "this match doesn't exist!"
     });
 }
 
-export default { generateToken, existingMatch, decodeToken }
+async function isAdmin (req: Request, res: Response, next: NextFunction) {
+    const { id, name, score } = req.cookies;
+    const { idMatch } = req.body;
+
+    console.log(id, name, score)
+    if (MatchFactory.isAdmin({ id, name, score }, idMatch)){
+        return next();
+    }
+
+    return res.status(404)
+        .json({ msg: "you can't do this because you're not an admin!" });
+}
+
+export default { generateToken, existingMatch, decodeToken, isAdmin }

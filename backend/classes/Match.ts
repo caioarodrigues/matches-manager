@@ -28,8 +28,8 @@ export default class Match implements IMatch{
 
         return player;
     }
-    public removePlayer(player: PlayerType) {
-        const index = this._params.players.indexOf(player);
+    public removePlayer(playerID: number) {
+        const index = this._params.players.findIndex(({ id }) => id === playerID);
 
         this._params.players.splice(index, 1);
     }
